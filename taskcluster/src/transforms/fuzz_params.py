@@ -14,7 +14,7 @@ parser.add_argument("--skip-output", default=False, action='store_true')
 
 @transforms.add
 def fuzz_params(config, tasks):
-    comment = os.environ.get("TASKCLUSTER_COMMENT", "")
+    comment = config.params.get("taskcluster_comment", "")
     try_config = os.environ.get("TRY_CONFIG", "")
 
     raw_params = None
