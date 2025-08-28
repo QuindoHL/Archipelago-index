@@ -1,7 +1,15 @@
 from . import optimize, target_tasks
 from eije_taskgraph import register as eije_taskgraph_register
 from taskgraph.morph import register_morph
+from taskgraph.parameters import extend_parameters_schema
+from voluptuous import Optional
 import json
+import os
+
+extend_parameters_schema({
+    Optional("pull_request_number"): int,
+    Optional("taskcluster_comment"): str,
+})
 
 @register_morph
 def handle_soft_fetches(taskgraph, label_to_taskid, parameters, graph_config):
@@ -29,3 +37,12 @@ def handle_soft_fetches(taskgraph, label_to_taskid, parameters, graph_config):
 
 def register(graph_config):
     eije_taskgraph_register(graph_config)
+
+def get_decision_parameters(graph_config, parameters):
+    pr_number = os.environ.get('GITHUB_PULL_REQUEST_NUMBER')
+    if pr_number is not None:
+        parameters['pull_request_number'] = int(pr_number)
+
+    tc_comment = os.environ.get("TASKCLUSTER_COMMENT")
+    if tc_comment is not None:
+        parameters['taskcluster_comment'] = tc_comment
